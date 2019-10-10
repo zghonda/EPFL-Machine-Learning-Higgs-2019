@@ -20,6 +20,7 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/
 
 # Generated files
 .idea/**/contentModel.xml
@@ -156,8 +157,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
-.ipynb_checkpoints
 
 # IPython
 profile_default/
@@ -206,3 +205,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# project internal stuff
+data/
+latex-example-paper/
