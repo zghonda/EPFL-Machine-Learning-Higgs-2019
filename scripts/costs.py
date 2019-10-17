@@ -4,7 +4,7 @@ import numpy as np
 """Function used to compute the loss."""
 
 
-def compute_loss(y, tx, w):
+def compute_mse(y, tx, w):
     """Calculate the loss.
     You can calculate the loss using mse or mae.
     """
