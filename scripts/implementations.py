@@ -7,7 +7,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
     w = initial_w
     loss = 0
-
+    
     for n_iter in range(max_iters):
         loss = compute_mse(y, tx, w)
         gradient = compute_gradient(y, tx, w)
