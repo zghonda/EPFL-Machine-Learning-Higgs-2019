@@ -24,7 +24,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     batch_size = 1
 
     for n_iter in range(max_iters):
-        for mini_batch_y, mini_batch_tx in batch_iter(y, tx, 1):
+        for mini_batch_y, mini_batch_tx in batch_iter(y, tx, batch_size):
             gradient = compute_stoch_gradient(mini_batch_y, mini_batch_tx, w)
             w = w - gamma * gradient
             loss = compute_mse(y, tx, w)

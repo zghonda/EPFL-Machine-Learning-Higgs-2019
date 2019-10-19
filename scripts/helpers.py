@@ -72,3 +72,13 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
+            
+    
+    
+    
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    fn = lambda a: [pow(a, d) for d in range(0, degree + 1)]
+    result = map(fn, x)
+    return np.asarray(list(result))
+
