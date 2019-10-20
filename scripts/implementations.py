@@ -6,29 +6,24 @@ from helpers import *
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
     w = initial_w
-    loss = 0
-    
+
     for n_iter in range(max_iters):
-        loss = compute_mse(y, tx, w)
         gradient = compute_gradient(y, tx, w)
-
         w = w - gamma * gradient
-
+    loss = compute_mse(y, tx, w)
     return w, loss
 
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm."""
     w = initial_w
-    loss = 0
-    batch_size = 1
 
     for n_iter in range(max_iters):
-        for mini_batch_y, mini_batch_tx in batch_iter(y, tx, batch_size):
+        for mini_batch_y, mini_batch_tx in batch_iter(y, tx, 1):
             gradient = compute_stoch_gradient(mini_batch_y, mini_batch_tx, w)
             w = w - gamma * gradient
-            loss = compute_mse(y, tx, w)
 
+    loss = compute_mse(y, tx, w)
     return w, loss
 
 
