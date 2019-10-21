@@ -25,7 +25,7 @@ def load_data(sub_sample=True, add_outlier=False):
     if add_outlier:
         # outlier experiment
         height = np.concatenate([height, [1.1, 1.2]])
-        weight = np.concatenate([weight, [51.5/0.454, 55.3/0.454]])
+        weight = np.concatenate([weight, [51.5 / 0.454, 55.3 / 0.454]])
 
     return height, weight, gender
 
@@ -72,13 +72,39 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-            
-    
-    
-    
-def build_poly(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree."""
-    fn = lambda a: [pow(a, d) for d in range(0, degree + 1)]
-    result = map(fn, x)
-    return np.asarray(list(result))
 
+
+def build_poly(x, degree):
+    """Performs polynomial extension."""
+    polynom = np.ones((len(x), 1))
+    for d in range(1, degree + 1):
+        polynom = np.c_[polynom, np.power(x, d)]
+
+    return polynom
+
+
+def group_indices(x):
+    """get the indices of the six groups.
+    Each variable contains the range of indices of each group
+    There 3 main groups of particles divided according to their PRI_jet_num
+    and each main group is divided to two subgroups depending on if they have a DER_mass_MMC or not.
+    Example: g0_ind_wo_mmc means indices of group 0 of the particles that don't have a DER_mass_MMC"""
+
+    g0_ind_wo_mmc = np.where(x[:, 22] == 0 & x[:, 0] == np.nan)
+    g0_ind_w_mmc = np.where(x[:, 22] == 0 & x[:, 0] != np.nan)
+    g1_ind_wo_mmc = np.where(x[:, 22] == 1 & x[:, 0] == np.nan)
+    g1_ind_w_mmc = np.where(x[:, 22] == 1 & x[:, 0] != np.nan)
+    g2_ind_wo_mmc = np.where(x[:, 22] >= 2 & x[:, 0] == np.nan)
+    g2_ind_w_mmc = np.where(x[:, 22] >= 2 & x[:, 0] != np.nan)
+
+    return [g0_ind_wo_mmc, g0_ind_w_mmc, g1_ind_wo_mmc, g1_ind_w_mmc, g2_ind_wo_mmc, g2_ind_w_mmc]
+
+
+def replace_data(x, replace, by):
+    return np.where(x == replace, by, x)
+
+
+def drop_na_columns(x):
+    na_columns = np.where(np.all(np.isnan(x), axis=0))[0]
+    result = np.delete(x, na_columns, axis=1)
+    return result
