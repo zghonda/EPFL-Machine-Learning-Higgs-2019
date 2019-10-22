@@ -120,6 +120,8 @@ def calculate_loss(y, tx, w):
 
     loss = np.sum(np.log(1 + np.exp(tx.dot(w)))) - y.T.dot(tx.dot(w))
     
+    #loss = np.log(np.power(sigmoid(tx.dot(w)), y)).dot(np.log(np.power(1-sigmoid(tx.dot(w)), 1-y)))
+    
     return loss
 
 def calculate_gradient(y, tx, w):
@@ -152,14 +154,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     # build tx with adding constant 1 as first column
     x = np.c_[np.ones((y.shape[0], 1)), tx]
     w = np.insert(initial_w, 0, 1)
-    #print(w.shape)
+
     # start the logistic regression
     for iter in range(max_iters):
         # get loss and update w.
-        #print(w.shape)
+
         w, loss = learning_by_gradient_descent(y, x, w, gamma)
-        #print(w.shape)
-        # log info
+
+        # For debug: log info
         if iter % 100 == 0:
             print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
         # converge criterion
@@ -195,14 +197,13 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # build tx with adding constant 1 as first column
     x = np.c_[np.ones((y.shape[0], 1)), tx]
     w = np.insert(initial_w, 0, 1)
-    #print(w.shape)
+
     # start the logistic regression
     for iter in range(max_iters):
         # get loss and update w.
-        #print(w.shape)
         w, loss = learning_by_penalized_gradient_descent(y, x, w, lambda_, gamma)
-        #print(w.shape)
-        # log info
+
+        # For debug: log info
         if iter % 100 == 0:
             print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
         # converge criterion
@@ -213,3 +214,46 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
 
         
     return  w, loss
+
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval]
+                 for k in range(k_fold)]
+    return np.array(k_indices)
+
+import matplotlib.pyplot as plt
+def cross_validation_demo(y, tx):
+    seed = 1
+    k_fold = 2
+    gammas = np.logspace(-7, -2.5, 30)
+    # split data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+    initial_w =np.zeros(tx.shape[1])    
+    train_setx = tx[k_indices]
+    train_sety = y[k_indices]
+    k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
+    test_setx = [tx[k_indices_not[i]] for i in range(k_fold)]
+    test_sety = [y[k_indices_not[i]] for i in range(k_fold)]
+    
+    # define lists to store the loss of training data and test data
+    rmse_tr = []
+    rmse_te = []
+    # ***************************************************
+    # INSERT YOUR CODE HERE
+    # cross validation: TODO
+    for i in range(len(gammas)):
+        
+        rmse_tr.append(logistic_regression(y, tx, initial_w, 1000, gammas[i])[1])
+        #rmse_tr.append(logistic_regression(test_sety, test_setx, initial_w, 1000, gammas[i]))
+
+        
+    # ***************************************************    
+    plt.plot(gammas, rmse_tr)
+
+    return rmse_tr
+
+
