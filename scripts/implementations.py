@@ -138,6 +138,7 @@ def learning_by_gradient_descent(y, tx, w, gamma):
     Return the loss and the updated w.
     """  
     grad = calculate_gradient(y, tx, w)
+    grad /= np.linalg.norm(grad)
     
     w = w - gamma*grad
     
@@ -180,6 +181,7 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
     Return the loss and the updated w.
     """  
     grad = calculate_gradient(y, tx, w) + lambda_*w
+    grad /= np.linalg.norm(grad)
     
     w = w - gamma*grad
     
@@ -190,7 +192,7 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # init parameters
-    threshold = 1e-8
+    threshold = 1e-4
     losses = []
     ws = []
        
@@ -229,7 +231,7 @@ import matplotlib.pyplot as plt
 def cross_validation_demo(y, tx):
     seed = 1
     k_fold = 2
-    gammas = np.logspace(-7, -2.5, 30)
+    gammas = np.logspace(-4, -2, 30)
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
@@ -247,7 +249,7 @@ def cross_validation_demo(y, tx):
     # cross validation: TODO
     for i in range(len(gammas)):
         
-        rmse_tr.append(logistic_regression(y, tx, initial_w, 1000, gammas[i])[1])
+        rmse_tr.append(logistic_regression(y, tx, initial_w, 10000, gammas[i])[1])
         #rmse_tr.append(logistic_regression(test_sety, test_setx, initial_w, 1000, gammas[i]))
 
         
