@@ -46,3 +46,36 @@ def create_csv_submission(ids, y_pred, name):
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
+
+
+def standardize(x):
+    """Standardize the original data set."""
+    mean_x = np.mean(x)
+    x = x - mean_x
+    std_x = np.std(x)
+    x = x / std_x
+    return x, mean_x, std_x
+
+
+def standardize_matrix(tx):
+    return (tx - np.mean(tx)) / np.std(tx)
+
+
+def build_poly(x, degree):
+    """Performs polynomial extension."""
+    polynom = np.ones((len(x), 1))
+    for d in range(1, degree + 1):
+        polynom = np.c_[polynom, np.power(x, d)]
+
+    return polynom
+
+
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval]
+                 for k in range(k_fold)]
+    return np.array(k_indices)
