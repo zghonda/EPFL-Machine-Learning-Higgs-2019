@@ -119,8 +119,7 @@ def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
 
     loss = np.sum(np.log(1 + np.exp(tx.dot(w)))) - y.T.dot(tx.dot(w))
-    
-    #loss = np.log(np.power(sigmoid(tx.dot(w)), y)).dot(np.log(np.power(1-sigmoid(tx.dot(w)), 1-y)))
+    loss /= tx.shape[0]
     
     return loss
 
@@ -129,6 +128,7 @@ def calculate_gradient(y, tx, w):
 
     #return gradient of log-likelihood loss
     gradient = tx.T.dot(sigmoid(tx.dot(w))-y)
+    gradient /= tx.shape[0]
     
     return gradient
 
@@ -138,7 +138,6 @@ def learning_by_gradient_descent(y, tx, w, gamma):
     Return the loss and the updated w.
     """  
     grad = calculate_gradient(y, tx, w)
-    grad /= np.linalg.norm(grad)
     
     w = w - gamma*grad
     
@@ -181,7 +180,6 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
     Return the loss and the updated w.
     """  
     grad = calculate_gradient(y, tx, w) + lambda_*w
-    grad /= np.linalg.norm(grad)
     
     w = w - gamma*grad
     
@@ -192,7 +190,8 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # init parameters
-    threshold = 1e-4
+    threshold = 1e-8
+
     losses = []
     ws = []
        
@@ -216,6 +215,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
 
         
     return  w, loss
+
+
 
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold."""
