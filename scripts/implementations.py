@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 
-
-from costs import compute_mse
-from gradient_descent import *
 from costs import compute_mse
 from gradient_descent import *
 from helpers import *
