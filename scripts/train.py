@@ -128,7 +128,7 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
         
             # compute loss for each iteration of the k_fold
             for k in range(k_fold):
-                weights, loss_train, loss_test = cross_validation(y, tx, k_indices, k, lambda_, degree)
+                weights, _, _ = cross_validation(y, tx, k_indices, k, lambda_, degree)
                 ###losses_test_tmp.append(loss_test)
                 y_pred = predict_labels(weights, build_poly(tx, degree))
                 accuracies_tmp.append(performance_measure(y_pred, y))
