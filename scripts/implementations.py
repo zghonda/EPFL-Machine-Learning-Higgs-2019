@@ -119,7 +119,7 @@ def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
 
     loss = np.sum(np.log(1 + np.exp(tx.dot(w)))) - y.T.dot(tx.dot(w))
-    loss /= tx.shape[0]
+    #loss /= tx.shape[0]
 
     return loss
 
@@ -128,7 +128,7 @@ def calculate_gradient(y, tx, w):
 
     #return gradient of log-likelihood loss
     gradient = tx.T.dot(sigmoid(tx.dot(w))-y)
-    gradient /= tx.shape[0]
+    #gradient /= tx.shape[0]
 
     
     return gradient
@@ -230,8 +230,9 @@ import matplotlib.pyplot as plt
 
 def cross_validation_gamma(y, tx):
     seed = 1
-    k_fold = 3
+    k_fold = 2
     gammas = np.logspace(-2, 0.5, 50)
+    
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
@@ -240,30 +241,29 @@ def cross_validation_gamma(y, tx):
     k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
     train_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
     train_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
-    #print(train_setx.shape, test_setx.shape)
+
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # cross validation: TODO
+
+    #iterate over all gammas
     for i in range(len(gammas)):
 
         loss_train = []
         loss_test = []
-
+        
+        #train the training sets and calculate loss for training and test sets
         for k in range(k_fold):
-            w_train = reg_logistic_regression(train_sety[k], train_setx[k], 0.01, initial_w, 100000, gammas[i])[0]
-            
+            w_train = reg_logistic_regression(train_sety[k], train_setx[k], 0.01, initial_w, 1000, gammas[i])[0]            
             loss_train.append(calculate_loss(train_sety[k], train_setx[k], w_train[1:]))
             loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
         
-        #w = np.mean(w_train, axis=0)
+        #average the mean loss for all K folds
         rmse_tr.append(np.mean(loss_train))
         rmse_te.append(np.mean(loss_test))
 
         
-    # ***************************************************    
+    # Sımple Plot
     plt.semilogx(gammas, rmse_tr, color='b' ,label = 'train', marker="|")
     plt.semilogx(gammas, rmse_te, color='r', label = 'test', marker="|")
     plt.ylabel('loss')
@@ -278,6 +278,7 @@ def cross_validation_lambda(y, tx):
     k_fold = 5
     gamma = 1
     lambdas = np.logspace(-5, 0, 50)
+    
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
@@ -290,25 +291,25 @@ def cross_validation_lambda(y, tx):
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # cross validation: TODO
+
+    #iterate over all lambdas
     for i in range(len(lambdas)):
 
         loss_train = []
         loss_test = []
-
+        
+        #split the set into K-folds, train w/ regularized regression for single set and calculate loss for training and test sets
         for k in range(k_fold):
-            w_train = reg_logistic_regression(train_sety[k], train_setx[k], lambdas[i], initial_w, 1000000, gamma)[0]
+            w_train = reg_logistic_regression(train_sety[k], train_setx[k], lambdas[i], initial_w, 10000, gamma)[0]
             loss_train.append(learning_by_penalized_gradient_descent(train_sety[k], train_setx[k], w_train[1:], lambdas[i], gamma)[1])
             loss_test.append(learning_by_penalized_gradient_descent(test_sety[k], test_setx[k], w_train[1:], lambdas[i], gamma)[1])
         
-        
+        #store average loss
         rmse_tr.append(np.mean(loss_train))
         rmse_te.append(np.mean(loss_test))
 
         
-    # ***************************************************    
+    # Simple Plot    
     plt.semilogx(lambdas, rmse_tr, color='b' ,label = 'train', marker="|")
     plt.semilogx(lambdas, rmse_te, color='r', label = 'test', marker="|")
     plt.ylabel('penalized loss')
@@ -319,7 +320,7 @@ def cross_validation_lambda(y, tx):
     return rmse_tr, rmse_te, lambdas
 
 def build_poly(x, degree):
-    """Performs polynomial extension."""
+    """Performs polynomial extension.  (Olivier)"""
     polynom = np.ones((len(x), 1))
     for d in range(1, degree + 1):
         polynom = np.c_[polynom, np.power(x, d)]
@@ -333,6 +334,7 @@ def cross_validation_degree(y, tx):
     gamma = 1
     degrees = np.array(range(10))
     lambda_=0.01
+    
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
@@ -345,9 +347,7 @@ def cross_validation_degree(y, tx):
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # cross validation: TODO
+
     for i in degrees:
 
         loss_train = []
@@ -378,6 +378,7 @@ def bias_variance_decomposition_visualization(degrees, rmse_tr, rmse_te):
     """visualize the bias variance decomposition."""
     rmse_tr_mean = np.expand_dims(np.mean(rmse_tr, axis=0), axis=0)
     rmse_te_mean = np.expand_dims(np.mean(rmse_te, axis=0), axis=0)
+    plt.ylim(0, 10)
     plt.plot(
         degrees,
         rmse_tr.T,
@@ -408,7 +409,7 @@ def bias_variance_decomposition_visualization(degrees, rmse_tr, rmse_te):
         linestyle="-",
         label='test',
         linewidth=3)
-    plt.ylim(0.2, 0.7)
+    plt.ylim(0, 10)
     plt.xlabel("degree")
     plt.ylabel("error")
     plt.title("Bias-Variance Decomposition")
@@ -436,7 +437,7 @@ def bias_variance_demo(y, tx):
     # define parameters
     seeds = range(1000)
     num_data = 10000
-    ratio_train = 0.05
+    ratio_train = 0.005
     degrees = range(5)
     
     # define list to store the variable
@@ -445,19 +446,10 @@ def bias_variance_demo(y, tx):
     
     for index_seed, seed in enumerate(seeds):
         np.random.seed(seed)
-        #x = np.linspace(0.1, 2 * np.pi, num_data)
-        #y = np.sin(x) + 0.3 * np.random.randn(num_data).T
-        # ***************************************************
-        # INSERT YOUR CODE HERE
-        # split data with a specific seed: TODO
+
+        # split data with a specific seed
         
         split_x, split_y = split_data(tx, y, ratio_train, seed)
-        
-        # ***************************************************
-        #raise NotImplementedError
-        # ***************************************************
-        # INSERT YOUR CODE HERE
-        # bias_variance_decomposition: TODO
         
         w = [logistic_regression(split_y, build_poly(split_x, degrees[i]), np.ones(degrees[i]*split_x.shape[1]+1), 100, 0.9)[0] for i in range(len(degrees))]
         
