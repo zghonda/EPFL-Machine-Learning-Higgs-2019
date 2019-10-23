@@ -228,17 +228,17 @@ def build_k_indices(y, k_fold, seed):
 import matplotlib.pyplot as plt
 def cross_validation_gamma(y, tx):
     seed = 1
-    k_fold = 20
+    k_fold = 3
     gammas = np.logspace(-2, 0.5, 50)
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
-    train_setx = tx[k_indices]
-    train_sety = y[k_indices]
+    test_setx = tx[k_indices]
+    test_sety = y[k_indices]
     k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
-    test_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
-    test_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
-    
+    train_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
+    train_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
+    #print(train_setx.shape, test_setx.shape)
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
@@ -249,16 +249,16 @@ def cross_validation_gamma(y, tx):
 
         loss_train = []
         loss_test = []
-        w_train = []
 
         for k in range(k_fold):
-            w_train.append(logistic_regression(train_sety[k], train_setx[k], initial_w, 100000, gammas[i])[0])
-            #loss_train.append(trained_loss)
-            #loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
+            w_train = logistic_regression(train_sety[k], train_setx[k], initial_w, 100000, gammas[i])[0]
+            
+            loss_train.append(calculate_loss(train_sety[k], train_setx[k], w_train[1:]))
+            loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
         
-        w = np.mean(w_train, axis=0)
-        rmse_tr.append(calculate_loss(train_sety[k], train_setx[k], w[1:]))
-        rmse_te.append(calculate_loss(test_sety[k], test_setx[k], w[1:]))
+        #w = np.mean(w_train, axis=0)
+        rmse_tr.append(np.mean(loss_train))
+        rmse_te.append(np.mean(loss_test))
 
         
     # ***************************************************    
@@ -273,17 +273,17 @@ def cross_validation_gamma(y, tx):
 
 def cross_validation_lambda(y, tx):
     seed = 1
-    k_fold = 20
+    k_fold = 3
     gamma = 1
     lambdas = np.logspace(-5, 0, 50)
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
-    train_setx = tx[k_indices]
-    train_sety = y[k_indices]
+    test_setx = tx[k_indices]
+    test_sety = y[k_indices]
     k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
-    test_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
-    test_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
+    train_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
+    train_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
     
     # define lists to store the loss of training data and test data
     rmse_tr = []
@@ -295,16 +295,15 @@ def cross_validation_lambda(y, tx):
 
         loss_train = []
         loss_test = []
-        w_train = []
 
         for k in range(k_fold):
-            w_train.append(reg_logistic_regression(train_sety[k], train_setx[k], lambdas[i], initial_w, 1000000, gamma)[0])
-            #loss_train.append(trained_loss)
-            #loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
+            w_train = reg_logistic_regression(train_sety[k], train_setx[k], lambdas[i], initial_w, 1000000, gamma)[0]
+            loss_train.append(learning_by_penalized_gradient_descent(train_sety[k], train_setx[k], w_train[1:], lambdas[i], gamma)[1])
+            loss_test.append(learning_by_penalized_gradient_descent(test_sety[k], test_setx[k], w_train[1:], lambdas[i], gamma)[1])
         
-        w = np.mean(w_train, axis=0)
-        rmse_tr.append(learning_by_penalized_gradient_descent(train_sety[k], train_setx[k], w[1:], lambdas[i], gamma)[1])
-        rmse_te.append(learning_by_penalized_gradient_descent(test_sety[k], test_setx[k], w[1:], lambdas[i], gamma)[1])
+        
+        rmse_tr.append(np.mean(loss_train))
+        rmse_te.append(np.mean(loss_test))
 
         
     # ***************************************************    
