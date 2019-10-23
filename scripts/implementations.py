@@ -148,8 +148,7 @@ def learning_by_gradient_descent(y, tx, w, gamma):
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     # init parameters
     threshold = 1e-8
-    losses = []
-    ws = []
+    prev_loss = 0
        
     # build tx with adding constant 1 as first column
     x = np.c_[np.ones((y.shape[0], 1)), tx]
@@ -162,12 +161,11 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         w, loss = learning_by_gradient_descent(y, x, w, gamma)
 
         # For debug: log info
-        if iter % 100 == 0:
-            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+        #if iter % 100 == 0:
+            #print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
         # converge criterion
-        losses.append(loss)
-        ws.append(w)
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        prev_loss = loss
+        if prev_loss != 0 and np.abs(loss - prev_loss) < threshold:
             break
 
         
@@ -191,9 +189,8 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # init parameters
     threshold = 1e-8
+    prev_loss = 0
 
-    losses = []
-    ws = []
        
     # build tx with adding constant 1 as first column
     x = np.c_[np.ones((y.shape[0], 1)), tx]
@@ -205,12 +202,12 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         w, loss = learning_by_penalized_gradient_descent(y, x, w, lambda_, gamma)
 
         # For debug: log info
-        if iter % 100 == 0:
-            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+        #if iter % 100 == 0:
+            #print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
         # converge criterion
-        losses.append(loss)
-        ws.append(w)
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        prev_loss = loss
+
+        if prev_loss != 0 and np.abs(loss - prev_loss) < threshold:
             break
 
         
@@ -229,18 +226,18 @@ def build_k_indices(y, k_fold, seed):
     return np.array(k_indices)
 
 import matplotlib.pyplot as plt
-def cross_validation_demo(y, tx):
+def cross_validation_gamma(y, tx):
     seed = 1
-    k_fold = 2
-    gammas = np.logspace(-4, -2, 30)
+    k_fold = 20
+    gammas = np.logspace(-2, 0.5, 50)
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     initial_w =np.zeros(tx.shape[1])    
     train_setx = tx[k_indices]
     train_sety = y[k_indices]
     k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
-    test_setx = [tx[k_indices_not[i]] for i in range(k_fold)]
-    test_sety = [y[k_indices_not[i]] for i in range(k_fold)]
+    test_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
+    test_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
     
     # define lists to store the loss of training data and test data
     rmse_tr = []
@@ -249,14 +246,73 @@ def cross_validation_demo(y, tx):
     # INSERT YOUR CODE HERE
     # cross validation: TODO
     for i in range(len(gammas)):
+
+        loss_train = []
+        loss_test = []
+        w_train = []
+
+        for k in range(k_fold):
+            w_train.append(logistic_regression(train_sety[k], train_setx[k], initial_w, 100000, gammas[i])[0])
+            #loss_train.append(trained_loss)
+            #loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
         
-        rmse_tr.append(logistic_regression(y, tx, initial_w, 10000, gammas[i])[1])
-        #rmse_tr.append(logistic_regression(test_sety, test_setx, initial_w, 1000, gammas[i]))
+        w = np.mean(w_train, axis=0)
+        rmse_tr.append(calculate_loss(train_sety[k], train_setx[k], w[1:]))
+        rmse_te.append(calculate_loss(test_sety[k], test_setx[k], w[1:]))
 
         
     # ***************************************************    
-    plt.plot(gammas, rmse_tr)
+    plt.semilogx(gammas, rmse_tr, color='b' ,label = 'train', marker="|")
+    plt.semilogx(gammas, rmse_te, color='r', label = 'test', marker="|")
+    plt.ylabel('loss')
+    plt.xlabel('gamma')
+    plt.legend()
+    plt.show()
 
-    return rmse_tr
+    return rmse_tr, rmse_te, gammas
 
+def cross_validation_lambda(y, tx):
+    seed = 1
+    k_fold = 20
+    gamma = 1
+    lambdas = np.logspace(-5, 0, 50)
+    # split data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+    initial_w =np.zeros(tx.shape[1])    
+    train_setx = tx[k_indices]
+    train_sety = y[k_indices]
+    k_indices_not = [np.isin(np.random.permutation(y.shape[0]), k_indices[i], invert=True) for i in range(k_fold)]
+    test_setx = np.asarray([tx[k_indices_not[i]] for i in range(k_fold)])
+    test_sety = np.asarray([y[k_indices_not[i]] for i in range(k_fold)])
+    
+    # define lists to store the loss of training data and test data
+    rmse_tr = []
+    rmse_te = []
+    # ***************************************************
+    # INSERT YOUR CODE HERE
+    # cross validation: TODO
+    for i in range(len(lambdas)):
 
+        loss_train = []
+        loss_test = []
+        w_train = []
+
+        for k in range(k_fold):
+            w_train.append(reg_logistic_regression(train_sety[k], train_setx[k], lambdas[i], initial_w, 1000000, gamma)[0])
+            #loss_train.append(trained_loss)
+            #loss_test.append(calculate_loss(test_sety[k], test_setx[k], w_train[1:]))
+        
+        w = np.mean(w_train, axis=0)
+        rmse_tr.append(learning_by_penalized_gradient_descent(train_sety[k], train_setx[k], w[1:], lambdas[i], gamma)[1])
+        rmse_te.append(learning_by_penalized_gradient_descent(test_sety[k], test_setx[k], w[1:], lambdas[i], gamma)[1])
+
+        
+    # ***************************************************    
+    plt.semilogx(lambdas, rmse_tr, color='b' ,label = 'train', marker="|")
+    plt.semilogx(lambdas, rmse_te, color='r', label = 'test', marker="|")
+    plt.ylabel('penalized loss')
+    plt.xlabel('lambda')
+    plt.legend()
+    plt.show()
+
+    return rmse_tr, rmse_te, lambdas
