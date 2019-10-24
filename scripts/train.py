@@ -24,12 +24,15 @@ def cross_validation_step(y, tx, k_indices, k, lambda_, degree):
     tx_validation = build_poly(tx_validation, degree)
 
     # optimization with one of the methods in "implementations.py"
-    ###weights, loss_train = ridge_regression(y_train, tx_train, lambda_)
-    weights, loss_train = reg_logistic_regression(y_train, tx_train, lambda_, np.zeros(tx_train.shape[1]), 1000, 0.05)
+    weights, loss_train = ridge_regression(y_train, tx_train, lambda_)
+    ###weights, loss_train = reg_logistic_regression(y_train, tx_train, lambda_, np.zeros(tx_train.shape[1]), 1000, 0.05)
 
     # compute the loss for the train and test datas with the weigths found
     ###loss_test = compute_mse(y_test, tx_test, weights)
-    loss_test = sigmoid_loss(y_validation, tx_validation, weights, logistic_function)
+    ###loss_test = sigmoid_loss(y_validation, tx_validation, weights, logistic_function)
+
+    # when optimizing by maximizing the accuracies, no need to compute the loss
+    loss_test = 0
 
     return weights, loss_train, loss_test
 
@@ -97,7 +100,7 @@ def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
         # Standardize the training subset
         tx_subset_standardized, _, _ = standardize(tx_subset)
 
-        opt_degree, opt_lambda = best_hyperparameters(y_subset, tx_subset_standardized, degrees, lambdas, k_fold, seed)
+        opt_degree, opt_lambda = best_hyperparameters_accuracy(y_subset, tx_subset_standardized, degrees, lambdas, k_fold, seed)
         weights, _ = ridge_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda)
         ###weights = reg_logistic_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda, np.zeros(build_poly(tx_subset_standardized, opt_degree).shape[1]), 5000, 0.05)
 
@@ -134,7 +137,7 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
 
             # compute loss for each iteration of the k_fold
             for k in range(k_fold):
-                weights, _, _ = cross_validation(y, tx, k_indices, k, lambda_, degree)
+                weights, _, _ = cross_validation_step(y, tx, k_indices, k, lambda_, degree)
                 ###losses_test_tmp.append(loss_test)
                 y_pred = predict_labels(weights, build_poly(tx, degree))
                 accuracies_tmp.append(performance_measure(y_pred, y))
