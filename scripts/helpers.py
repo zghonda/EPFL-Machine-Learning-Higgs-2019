@@ -76,7 +76,9 @@ def group_indices(x):
     return [g0_ind_wo_mmc, g0_ind_w_mmc, g1_ind_wo_mmc, g1_ind_w_mmc, g2_ind_wo_mmc, g2_ind_w_mmc]
 
 
+# x is the array, replace the old value and by is the new value
 def replace_data(x, replace, by):
+    """"""
     return np.where(x == replace, by, x)
 
 
@@ -88,12 +90,14 @@ def drop_na_columns(x):
 
 def preprocess_data(x_train, x_test):
     """ Apply data pre processing and cleaning """
+    # drop columns that have only Nan values
+    x_train, x_test = drop_na_columns(x_train), drop_na_columns(x_test)
+
     # data standardization
     x_train, mean_tr, std_tr = standardize(x_train)
     x_test = (x_test - mean_tr) / std_tr  # ref : https://bit.ly/2MytlBg
 
-    # drop columns that have only Nan values
-    x_train, x_test = drop_na_columns(x_train), drop_na_columns(x_test)
+
 
     return x_train, x_test
 

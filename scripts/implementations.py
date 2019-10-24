@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from costs import compute_mse
+from costs import *
 from gradient_descent import *
 from helpers import *
 from proj1_helpers import predict_labels
+from sigmoids import *
+
 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
@@ -48,6 +50,34 @@ def ridge_regression(y, tx, lambda_):
 
     loss = compute_mse(y, tx, w_star) + lambda_ * np.linalg.norm(w_star) ** 2
     return w_star, loss
+
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """implement logistic regression using gradient descent"""
+    w = initial_w
+    sigmoid = logistic_function
+
+    for iter in range(max_iters):
+        gradient = compute_gradient_sigmoid(y, tx, w, sigmoid)
+        w -= gamma * gradient
+
+    loss = sigmoid_loss(y, tx, w, sigmoid)
+
+    return w, loss
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    w = initial_w
+    sigmoid = logistic_function
+
+    for _ in range(max_iters):
+        gradient = compute_gradient_sigmoid(y, tx, w, sigmoid) + lambda_ * w
+        w -= gamma * gradient
+
+    loss = sigmoid_loss(y, tx, w, sigmoid) + lambda_ * (w.T@w).item(0) / 2
+
+    return w, loss
+
+
 
 
 def predict(x_train, y_train, x_test, y_test, lambda_, degree):
