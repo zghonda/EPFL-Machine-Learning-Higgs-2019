@@ -118,6 +118,7 @@ def sigmoid(t):
 def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
 
+    #return log likelihood loss
     loss = np.sum(np.log(1 + np.exp(tx.dot(w)))) - y.T.dot(tx.dot(w))
     #loss /= tx.shape[0]
 
@@ -163,8 +164,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
         # For debug: log info
         #if iter % 100 == 0:
-            #print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
-        # converge criterion
+            #print("Current iteration={i}, loss={l}".format(i=iter, l=loss)
+            
+        # converging criterion, end loop if values are close
         prev_loss = loss
         if prev_loss != 0 and np.abs(loss - prev_loss) < threshold:
             break
@@ -177,7 +179,8 @@ def learning_by_penalized_gradient_descent(y, tx, w, lambda_, gamma):
     """
     Do one step of gradient descen using logistic regression.
     Return the loss and the updated w.
-    """  
+    """ 
+   
     grad = calculate_gradient(y, tx, w) + lambda_*w
     
     w = w - gamma*grad
@@ -191,7 +194,6 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # init parameters
     threshold = 1e-8
     prev_loss = 0
-
        
     # build tx with adding constant 1 as first column
     x = np.c_[np.ones((y.shape[0], 1)), tx]
@@ -206,7 +208,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         #if iter % 100 == 0:
             #print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
         
-        # converge criterion        
+        # converging criterion, end loop if values are close        
         prev_loss = loss
         if prev_loss != 0 and np.abs(loss - prev_loss) < threshold:
             break
@@ -378,7 +380,6 @@ def bias_variance_decomposition_visualization(degrees, rmse_tr, rmse_te):
     """visualize the bias variance decomposition."""
     rmse_tr_mean = np.expand_dims(np.mean(rmse_tr, axis=0), axis=0)
     rmse_te_mean = np.expand_dims(np.mean(rmse_te, axis=0), axis=0)
-    plt.ylim(0, 10)
     plt.plot(
         degrees,
         rmse_tr.T,
@@ -409,7 +410,7 @@ def bias_variance_decomposition_visualization(degrees, rmse_tr, rmse_te):
         linestyle="-",
         label='test',
         linewidth=3)
-    plt.ylim(0, 10)
+    plt.ylim([0, 1])
     plt.xlabel("degree")
     plt.ylabel("error")
     plt.title("Bias-Variance Decomposition")
