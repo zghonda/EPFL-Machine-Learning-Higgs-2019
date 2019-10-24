@@ -8,11 +8,12 @@ from sigmoids import *
 # compute cross validation for training, return the optimal weigths and theirs respective loss for the train and the
 # test datas
 def cross_validation_step(y, tx, k_indices, k, lambda_, degree):
-    # get k'th subgroup in test, others in train
+
+    # get k'th subgroup for the validation set, the others will be in the training set
     training_indices = k_indices[~(np.arange(len(k_indices)) == k)].reshape(-1)
     validation_indices = k_indices[k]
 
-
+    # create the validation and the training subsets
     tx_train = tx[training_indices]
     tx_validation = tx[validation_indices]
     y_train = y[training_indices]
@@ -24,7 +25,7 @@ def cross_validation_step(y, tx, k_indices, k, lambda_, degree):
 
     # optimization with one of the methods in "implementations.py"
     ###weights, loss_train = ridge_regression(y_train, tx_train, lambda_)
-    weights, loss_train = reg_logistic_regression(y_train, tx_train, lambda_, np.zeros(tx_train.shape[1]), 5000, 0.05)
+    weights, loss_train = reg_logistic_regression(y_train, tx_train, lambda_, np.zeros(tx_train.shape[1]), 1000, 0.05)
 
     # compute the loss for the train and test datas with the weigths found
     ###loss_test = compute_mse(y_test, tx_test, weights)
@@ -55,7 +56,7 @@ def best_hyperparameters(y, tx, degrees, lambdas, k_fold, seed=1):
             # of the k-fold and computing the mean
             losses_test_tmp = []
 
-            # perform cross-validation 
+            # perform cross-validation
             for k in range(k_fold):
                 weigths, loss_train, loss_test = cross_validation_step(y, tx, k_indices, k, lambda_, degree)
                 losses_test_tmp.append(loss_test)
@@ -81,7 +82,6 @@ def best_hyperparameters(y, tx, degrees, lambdas, k_fold, seed=1):
 # compute the best hyperparameters for regularized optimization for each subset of the training dataset
 #  and return the best weights of each subset, respective to the best hyperparameters
 def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
-
     # get the indices of each training subset
     indices_group = group_indices(tx)
 
@@ -98,8 +98,8 @@ def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
         tx_subset_standardized, _, _ = standardize(tx_subset)
 
         opt_degree, opt_lambda = best_hyperparameters(y_subset, tx_subset_standardized, degrees, lambdas, k_fold, seed)
-        ###weights, _ = ridge_regression(y_subset, build_poly(tx_subset, opt_degree), opt_lambda)
-        weights = reg_logistic_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda, np.zeros(build_poly(tx_subset_standardized, opt_degree).shape[1]), 5000, 0.05)
+        weights, _ = ridge_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda)
+        ###weights = reg_logistic_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda, np.zeros(build_poly(tx_subset_standardized, opt_degree).shape[1]), 5000, 0.05)
 
         best_degree.append(opt_degree)
         best_weights.append(weights)

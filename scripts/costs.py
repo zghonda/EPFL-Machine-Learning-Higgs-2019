@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def compute_mse(y, tx, w):
     """Function used to compute the loss."""
     # Compute the error

@@ -7,7 +7,6 @@ from proj1_helpers import predict_labels
 from sigmoids import *
 
 
-
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
     w = initial_w
@@ -65,6 +64,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
     return w, loss
 
+
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     w = initial_w
     sigmoid = logistic_function
@@ -76,8 +76,6 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     loss = sigmoid_loss(y, tx, w, sigmoid) + lambda_ * (w.T@w).item(0) / 2
 
     return w, loss
-
-
 
 
 def predict(x_train, y_train, x_test, y_test, lambda_, degree):
