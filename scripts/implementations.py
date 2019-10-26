@@ -60,7 +60,8 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         gradient = compute_gradient_sigmoid(y, tx, w, sigmoid)
         w -= gamma * gradient
 
-    loss = sigmoid_loss(y, tx, w, sigmoid)
+    #loss = sigmoid_loss(y, tx, w, sigmoid)
+    loss = np.NaN
 
     return w, loss
 
