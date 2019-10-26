@@ -107,3 +107,17 @@ def performance_measure(y_pred, y):
     diff = y_pred - y
     n_correct = diff[diff == 0].shape[0]
     return n_correct / len(y)
+
+
+def cross_validation_get_indices(y, tx, k_indices, k):
+
+    training_indices = k_indices[~(np.arange(len(k_indices)) == k)].reshape(-1)
+    validation_indices = k_indices[k]
+
+    # create the validation and the training subsets
+    tx_train = tx[training_indices]
+    tx_validation = tx[validation_indices]
+    y_train = y[training_indices]
+    y_validation = y[validation_indices]
+
+    return tx_train, tx_validation, y_train, y_validation
