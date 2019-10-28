@@ -22,7 +22,7 @@ Here's a list of the relevant source files
 |`train_logistic_regression.py`|Containing the functions used to train the models, specifically for logistic regression using gradient descent or stochastic gradient descent|
 |`train_reg_logistic_regression.py`|Containing the functions used to train the models, specifically for regularized logistic regression using gradient descent or stochastic gradient descent|
 |`train_ridge_regression.py`|Containing the functions used to train the models, specifically for ridge regression using the normal equations|
-|`projet1.ipynb`|Notebook of the project with all the details|
+|`projet1.ipynb`|Notebook of the project with all the visualization and the analysis of the training data and the details about the training of the models|
   
 
 ## Requirements
@@ -33,11 +33,12 @@ Please make sure you have `Python 3`  with the following packages installed :
  
  `matplotlib`  
  
-` pandas`
 
 
 
 ## Instructions
+
+Please run the following commands on a terminal to run the main program
 
 ~~~~shell
 cd script
