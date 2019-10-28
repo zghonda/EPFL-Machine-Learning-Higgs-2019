@@ -3,7 +3,6 @@
 from costs import *
 from gradient_descent import *
 from helpers import *
-from proj1_helpers import predict_labels
 from sigmoids import *
 
 
