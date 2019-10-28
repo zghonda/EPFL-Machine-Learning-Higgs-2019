@@ -105,7 +105,7 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
             for k in range(k_fold):
                 weights, _, _ = cross_validation_step(y, tx, k_indices, k, lambda_, degree)
                 ###losses_test_tmp.append(loss_test)
-                y_pred = predict_labels(weights, build_poly(tx, degree))
+                y_pred = predict_labels(weights, build_poly(tx, degree), logistic=False)
                 accuracies_tmp.append(performance_measure(y_pred, y))
 
             # compute the loss for the specific lambda by taking the mean of the losses of each iteration of the k-fold
@@ -128,7 +128,7 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
 
 # compute the best hyperparameters for regularized optimization for each subset of the training dataset
 #  and return the best weights of each subset, respective to the best hyperparameters
-def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
+def train_models_ridge_regression(y, tx, degrees, lambdas, k_fold, seed=1):
     # get the indices of each training subset
     indices_group = group_indices(tx)
 
@@ -138,7 +138,8 @@ def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
     best_lambda = []
 
     # compute the optimal hyperparameters for each training subset and the respective weights
-    for indice_group in indices_group:
+    for i, indice_group in enumerate(indices_group):
+        print('Computing optimal weights and hyper parameters for the ', i + 1, 'th subset...')
         y_subset = y[indice_group]
         tx_subset = drop_na_columns(tx[indice_group])
 
@@ -147,7 +148,6 @@ def train_models(y, tx, degrees, lambdas, k_fold, seed=1):
 
         opt_degree, opt_lambda = best_hyperparameters_accuracy(y_subset, tx_subset_standardized, degrees, lambdas, k_fold, seed)
         weights, _ = ridge_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda)
-        ###weights = reg_logistic_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda, np.zeros(build_poly(tx_subset_standardized, opt_degree).shape[1]), 5000, 0.05)
 
         best_degree.append(opt_degree)
         best_weights.append(weights)

@@ -47,7 +47,8 @@ def ridge_regression(y, tx, lambda_):
     snd_term = tx.T @ y
     w_star = fst_term @ snd_term
 
-    loss = compute_mse(y, tx, w_star) + lambda_ * np.linalg.norm(w_star) ** 2
+    #loss = compute_mse(y, tx, w_star) + lambda_ * np.linalg.norm(w_star) ** 2
+    loss = np.NaN
     return w_star, loss
 
 
@@ -74,7 +75,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         gradient = compute_gradient_sigmoid(y, tx, w, sigmoid) + lambda_ * w
         w -= gamma * gradient
 
-    loss = sigmoid_loss(y, tx, w, sigmoid) + lambda_ * (w.T@w).item(0) / 2
+    # loss = sigmoid_loss(y, tx, w, sigmoid) + lambda_ * (w.T@w).item(0) / 2
+    loss = np.NaN
 
     return w, loss
 

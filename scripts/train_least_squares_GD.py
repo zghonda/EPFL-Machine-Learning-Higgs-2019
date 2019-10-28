@@ -77,7 +77,7 @@ def best_hyperparameters_accuracy_least_squares_GD(y, tx, degrees, gamma, max_it
         # compute loss for each iteration of the k_fold
         for k in range(k_fold):
             weights, _, _ = cross_validation_step_least_squares_GD(y, tx, k_indices, k, gamma, degree, max_iters)
-            y_pred = predict_labels(weights, build_poly(tx, degree))
+            y_pred = predict_labels(weights, build_poly(tx, degree), logistic=False)
             accuracies_tmp.append(performance_measure(y_pred, y))
 
         accuracies.append(np.mean(accuracies_tmp))

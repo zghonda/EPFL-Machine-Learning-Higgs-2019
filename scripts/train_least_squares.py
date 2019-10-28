@@ -75,7 +75,7 @@ def best_hyperparameters_accuracy_least_squares(y, tx, degrees, k_fold, seed=1):
 
         for k in range(k_fold):
             weights, _, _ = cross_validation_step_least_squares(y, tx, k_indices, k, degree)
-            y_pred = predict_labels(weights, build_poly(tx, degree))
+            y_pred = predict_labels(weights, build_poly(tx, degree), logistic=False)
             accuracies_tmp.append(performance_measure(y_pred, y))
 
         accuracies.append(np.mean(accuracies_tmp))

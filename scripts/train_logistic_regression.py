@@ -96,7 +96,7 @@ def best_hyperparameters_accuracy_logistic_regression(y, tx, degrees, gamma, k_f
         for k in range(k_fold):
             weights, _, _ = cross_validation_step_logistic_regression(y, tx, k_indices, k, gamma, degree,
                                                                       max_iter)
-            y_pred = predict_labels(weights, build_poly(tx, degree))
+            y_pred = predict_labels(weights, build_poly(tx, degree), logistic=True)
             accuracies_tmp.append(performance_measure(y_pred, y))
 
         accuracies.append(np.mean(accuracies_tmp))
