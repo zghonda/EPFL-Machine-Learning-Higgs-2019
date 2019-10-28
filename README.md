@@ -38,6 +38,8 @@ Please make sure you have `Python 3`  with the following packages installed :
 
 ## Instructions
 
+Please run the following commands on a terminal to run the main program
+
 ~~~~shell
 cd script
 python run.py
