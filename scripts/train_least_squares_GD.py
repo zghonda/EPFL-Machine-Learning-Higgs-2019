@@ -37,10 +37,10 @@ def best_hyperparameters_least_squares_GD(y, tx, degrees, gamma, max_iters, k_fo
     # build k indices for k-fold
     k_indices = build_k_indices(y, k_fold, seed)
 
-    # compute cross validation with all lambdas for each degree
+    # compute cross validation for each degree
     for degree in degrees:
 
-        # store the loss, respective to the lambdas
+        # store the loss, respective to the degree
         losses_tmp = []
 
         # perform cross-validation
@@ -62,16 +62,16 @@ def best_hyperparameters_least_squares_GD(y, tx, degrees, gamma, max_iters, k_fo
 # compute the best hyperparameters for regularized optimization
 def best_hyperparameters_accuracy_least_squares_GD(y, tx, degrees, gamma, max_iters, k_fold, seed=1):
 
-    # for each degree, store the best gamma and the respective accuracy
+    # for each degree, store the best respective accuracy
     accuracies = []
 
     # build k indices for k-fold
     k_indices = build_k_indices(y, k_fold, seed)
 
-    # compute cross validation with all lambdas for each degree
+    # compute cross validation for each degree
     for degree in degrees:
 
-        # store the loss, respective to the lambdas
+        # store the accuracy, respective to the degree
         accuracies_tmp = []
 
         # compute loss for each iteration of the k_fold
@@ -97,7 +97,7 @@ def train_models_least_squares_GD(y, tx, degrees, gamma, max_iters, k_fold, seed
     # get the indices of each training subset
     indices_group = group_indices(tx)
 
-    # store the best weights, degree and lambda for each training subset
+    # store the best weights and degree for each training subset
     best_weights = []
     best_degree = []
 

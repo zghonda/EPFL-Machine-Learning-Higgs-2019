@@ -126,7 +126,7 @@ def cross_validation_get_indices(y, tx, k_indices, k):
 
 
 def predict(initial_y, tx, tx_test, indices_test_group, indices_train_group, best_weights, best_degrees, logistic):
-
+    """Return the prediction labels for the testing dataset"""
 
     y_pred = initial_y
 
