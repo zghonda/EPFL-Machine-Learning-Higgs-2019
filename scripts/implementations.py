@@ -279,7 +279,7 @@ def cross_validation_lambda(y, tx):
     seed = 1
     k_fold = 5
     gamma = 1
-    lambdas = np.logspace(-5, 0, 50)
+    lambdas = np.logspace(-5, 0, 20)
     
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
@@ -463,3 +463,29 @@ def bias_variance_demo(y, tx):
     
     
     return rmse_tr, rmse_te
+
+
+
+def group_indices(x):
+    
+    """get the indices of the six groups.
+    Each column contains the range of indices of each group
+    There 3 main groups of particles divided according to their PRI_jet_num
+    and each main group is divided to two subgroups depending on if they have a DER_mass_MMC or not."""
+
+    # g0_ind_wo_mmc means indices of group 0 of the particles that don't have a DER_mass_MMC
+
+    g0_ind_wo_mmc = np.where((x[:, 22] == 0) & (np.isnan(x[:, 0])))
+    g0_ind_w_mmc = np.where((x[:, 22] == 0) & (~np.isnan(x[:, 0])))
+    g1_ind_wo_mmc = np.where((x[:, 22] == 1) & (np.isnan(x[:, 0])))
+    g1_ind_w_mmc = np.where((x[:, 22] == 1) & (~np.isnan(x[:, 0])))
+    g2_ind_wo_mmc = np.where((x[:, 22] >= 2) & (np.isnan(x[:, 0])))
+    g2_ind_w_mmc = np.where((x[:, 22] >= 2) & (~np.isnan(x[:, 0])))
+
+    return [g0_ind_wo_mmc, g0_ind_w_mmc, g1_ind_wo_mmc, g1_ind_w_mmc, g2_ind_wo_mmc, g2_ind_w_mmc]
+
+
+def drop_na_columns(x):
+    """Drops all columns that have only NaN values"""
+    result = x[:, ~np.all(np.isnan(x), axis=0)]
+    return result
