@@ -3,7 +3,7 @@
 Higgs Boson particle identification using machine learning project for the EPFL Machine Learning course. The problem was 
 orinally proposed by CERN as a Kaggle challenge using a 250 000 samples dataset recorded by the research center. 
 
-In this repo you will find the solution proposed by my team to this challenge
+In this repo you will find the solution proposed by my team for this challenge
 
 
 For more information follow this [link](https://www.kaggle.com/c/higgs-boson/overview)
