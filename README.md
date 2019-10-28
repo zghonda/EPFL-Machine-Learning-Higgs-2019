@@ -16,7 +16,13 @@ Here's a list of the relevant source files
 |---|---|
 | `implementations.py`|Regrouping the common machine learning regression algorithms|
 |`run.py`|Main script containing the solution of the problem|
-|||
+|`helpers.py`|Containing all the additional functions used in the project|
+|`train_least_squares.py`|Containing the functions used to train the models, specifically for least squares optimization with normal equations|
+|`train_least_squares_GD.py`|Containing the functions used to train the models, specifically for least squares optimization using gradient descent or stochastic gradient descent|
+|`train_logistic_regression.py`|Containing the functions used to train the models, specifically for logistic regression using gradient descent or stochastic gradient descent|
+|`train_reg_logistic_regression.py`|Containing the functions used to train the models, specifically for regularized logistic regression using gradient descent or stochastic gradient descent|
+|`train_ridge_regression.py`|Containing the functions used to train the models, specifically for ridge regression using the normal equations|
+|`projet1.ipynb`|Notebook of the project with all the details|
   
 
 ## Requirements
