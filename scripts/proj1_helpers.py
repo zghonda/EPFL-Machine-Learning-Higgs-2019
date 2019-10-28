@@ -24,11 +24,16 @@ def load_csv_data(data_path, sub_sample=False):
     return yb, input_data, ids
 
 
-def predict_labels(weights, data):
+def predict_labels(weights, data, logistic):
     """Generates class predictions given weights, and a test data matrix"""
+    if logistic:
+        threshold = 0.5
+    else:
+        threshold = 0
+
     y_pred = np.dot(data, weights)
-    y_pred[np.where(y_pred <= 0)] = -1
-    y_pred[np.where(y_pred > 0)] = 1
+    y_pred[np.where(y_pred <= threshold)] = -1
+    y_pred[np.where(y_pred > threshold)] = 1
     
     return y_pred
 
@@ -46,5 +51,3 @@ def create_csv_submission(ids, y_pred, name):
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
-
-
