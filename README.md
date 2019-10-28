@@ -33,7 +33,6 @@ Please make sure you have `Python 3`  with the following packages installed :
  
  `matplotlib`  
  
-` pandas`
 
 
 
