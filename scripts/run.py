@@ -35,6 +35,9 @@ k_fold = 4
 # initialize the maximum number of iterations for updating the weights when using gradient descent
 max_iters = 1000
 
+# initialize seed
+seed = 1
+
 # Get the indices of the subsets in the training and the test datasets
 indices_train_group = group_indices(tX)
 indices_test_group = group_indices(tX_test)
@@ -43,8 +46,7 @@ indices_test_group = group_indices(tX_test)
 initial_y_pred = np.zeros(tX_test.shape[0])
 
 # train our models by computing the best weights, degree (for polynomial expansion) and lambda for each model
-best_weights, best_degree, best_lambda = train_models_ridge_regression(y, tX, degrees, lambdas, k_fold, seed=50)
-
+best_weights, best_degree, best_lambda = train_models_ridge_regression(y, tX, degrees, lambdas, k_fold, seed)
 
 # predict the labels for the samples in
 y_pred = predict(initial_y_pred, tX, tX_test, indices_test_group, indices_train_group, best_weights, best_degree, logistic=False)
