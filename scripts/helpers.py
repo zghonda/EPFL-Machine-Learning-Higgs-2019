@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """some helper functions."""
 import numpy as np
+from proj1_helpers import predict_labels
 
 
 def standardize(x):
@@ -9,6 +10,7 @@ def standardize(x):
     x = x - mean_x
     std_x = np.std(x)
     x = x / std_x
+
     return x, mean_x, std_x
 
 
@@ -85,6 +87,7 @@ def replace_data(x, replace, by):
 def drop_na_columns(x):
     """Drops all columns that have only NaN values"""
     result = x[:, ~np.all(np.isnan(x), axis=0)]
+
     return result
 
 
@@ -97,8 +100,6 @@ def preprocess_data(x_train, x_test):
     x_train, mean_tr, std_tr = standardize(x_train)
     x_test = (x_test - mean_tr) / std_tr  # ref : https://bit.ly/2MytlBg
 
-
-
     return x_train, x_test
 
 
@@ -106,6 +107,7 @@ def performance_measure(y_pred, y):
     """ Measures the accuracy of the predictions"""
     diff = y_pred - y
     n_correct = diff[diff == 0].shape[0]
+
     return n_correct / len(y)
 
 
@@ -121,3 +123,25 @@ def cross_validation_get_indices(y, tx, k_indices, k):
     y_validation = y[validation_indices]
 
     return tx_train, tx_validation, y_train, y_validation
+
+
+def predict(initial_y, tx, tx_test, indices_test_group, indices_train_group, best_weights, best_degrees, logistic):
+
+
+    y_pred = initial_y
+
+    for i, indice_test_group in enumerate(indices_test_group):
+        # for standardizing the test subset, we need the data of both train and test subsets
+        tx_subset = tx[indices_train_group[i]]
+        tx_test_subset = tx_test[indice_test_group]
+
+        # get the standardized test subset
+        _, standardized_tx_test_subset = preprocess_data(tx_subset, tx_test_subset)
+
+        # predict the labels
+        y_pred_subset = predict_labels(best_weights[i], build_poly(standardized_tx_test_subset, best_degrees[i]),
+                                       logistic)
+
+        y_pred[indice_test_group] = y_pred_subset
+
+    return y_pred

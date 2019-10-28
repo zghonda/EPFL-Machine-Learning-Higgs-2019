@@ -20,12 +20,12 @@ _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
 tX, tX_test = replace_data(tX, replace=-999, by=np.NaN), replace_data(tX_test, replace= -999, by=np.NaN)
 
 
-# Parameters initialisation and definition
+# INITIALIZATION AND DEFINITION OF ALL THE PARAMETERS
 
 # The degrees to choose from for the polynomial expansion
 degrees = np.arange(2, 8)
 
-# The hyperparameters to choose from for regularized regressions
+# The hyper parameters to choose from for regularized regressions
 lambdas = np.logspace(-4, 0, 20)
 gamma = 0.01
 
@@ -42,21 +42,25 @@ indices_test_group = group_indices(tX_test)
 # initialize the prediction array
 y_pred = np.zeros(tX_test.shape[0])
 
-from train_ridge_regression import *
+# train our models by computing the best weights, degree (for polynomial expansion) and lambda for each model
+best_weights, best_degree, best_lambda = train_models_ridge_regression(y, tX, degrees, lambdas, k_fold, seed=50)
 
-best_weights, best_degree, best_lambda = train_models_ridge_regression(y, tX, degrees, lambdas, k_fold)
 
+# predict the labels for the samples in
 for i, indice_test_group in enumerate(indices_test_group):
     # for standardizing the test subset, we need the data of both train and test subsets
-    tx_subset = tX[indices_train_group]
+    tx_subset = tX[indices_train_group[i]]
     tx_test_subset = tX_test[indice_test_group]
 
     # get the standardized test subset
     _, standardized_tx_test_subset = preprocess_data(tx_subset, tx_test_subset)
 
     # predict the labels
-    y_pred_subset = predict_labels(best_weights[i][0], build_poly(standardized_tx_test_subset, best_degree[i]), logistic=False)
+    y_pred_subset = predict_labels(best_weights[i], build_poly(standardized_tx_test_subset, best_degree[i]),
+                                   logistic=False)
     y_pred[indice_test_group] = y_pred_subset
 
-OUTPUT_PATH = '../data/sample-submission_reg_log.csv'
+OUTPUT_PATH = '../data/sample-submission.csv'
 create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
+
+print("Sample submission created.")

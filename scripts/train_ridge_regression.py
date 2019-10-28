@@ -19,11 +19,9 @@ def cross_validation_step(y, tx, k_indices, k, lambda_, degree):
 
     # optimization with one of the methods in "implementations.py"
     weights, loss_train = ridge_regression(y_train, tx_train, lambda_)
-    ###weights, loss_train = reg_logistic_regression(y_train, tx_train, lambda_, np.zeros(tx_train.shape[1]), 1000, 0.05)
 
     # compute the loss for the train and test datas with the weigths found
-    ###loss_test = compute_mse(y_test, tx_test, weights)
-    ###loss_test = sigmoid_loss(y_validation, tx_validation, weights, logistic_function)
+    loss_test = compute_mse(y_validation, tx_validation, weights)
 
     # when optimizing by maximizing the accuracies, no need to compute the loss
     loss_test = np.NaN
@@ -33,6 +31,7 @@ def cross_validation_step(y, tx, k_indices, k, lambda_, degree):
 
 # compute the best hyperparameters for regularized optimization
 def best_hyperparameters(y, tx, degrees, lambdas, k_fold, seed=1):
+
     # for each degree, store the best lambda and the respective loss
     losses = []
     lambdas_best = []
@@ -78,8 +77,8 @@ def best_hyperparameters(y, tx, degrees, lambdas, k_fold, seed=1):
 
 # compute the best hyperparameters for regularized optimization
 def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
-    # for each degree, store the best lambda and the respective loss
-    ###losses = []
+
+    # for each degree, store the best lambda and the respective accuracy
     lambdas_best = []
     accuracies = []
 
@@ -89,34 +88,32 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
     # compute cross validation with all lambdas for each degree
     for degree in degrees:
 
-        # store the loss, respective to the lambdas
-        ###losses_test = []
+        # store the accuracy, respective to the lambdas
         accuracies_lambda = []
 
         # compute cross validation for each lambda of the specific degree
         for lambda_ in lambdas:
 
-            # to compute the total loss of each lambda by storing the loss for each iteration 
+            # to compute the total loss of each lambda by storing the accuracy for each iteration
             # of the k-fold and computing the mean
-            ###losses_test_tmp = []
             accuracies_tmp = []
 
             # compute loss for each iteration of the k_fold
             for k in range(k_fold):
                 weights, _, _ = cross_validation_step(y, tx, k_indices, k, lambda_, degree)
-                ###losses_test_tmp.append(loss_test)
                 y_pred = predict_labels(weights, build_poly(tx, degree), logistic=False)
                 accuracies_tmp.append(performance_measure(y_pred, y))
 
-            # compute the loss for the specific lambda by taking the mean of the losses of each iteration of the k-fold
+            # compute the accuracy for the specific lambda by taking the mean of the losses of each iteration of
+            # the k-fold
             accuracies_lambda.append(np.mean(accuracies_tmp))
 
-        # find the optimal lambda hyperparameter by getting the minimum loss for each degree
+        # find the optimal lambda hyperparameter by getting the maximum accuracy for each degree
         best_lambda_index = np.argmax(accuracies_lambda)
         lambdas_best.append(lambdas[best_lambda_index])
         accuracies.append(accuracies_lambda[best_lambda_index])
 
-    # find the optimal degree hyperparameter by getting the minimum loss
+    # find the optimal degree hyperparameter by getting the maximum accuracy
     best_degree_index = np.argmax(accuracies)
 
     # compute the optimal hyperparameters
@@ -129,6 +126,7 @@ def best_hyperparameters_accuracy(y, tx, degrees, lambdas, k_fold, seed=1):
 # compute the best hyperparameters for regularized optimization for each subset of the training dataset
 #  and return the best weights of each subset, respective to the best hyperparameters
 def train_models_ridge_regression(y, tx, degrees, lambdas, k_fold, seed=1):
+
     # get the indices of each training subset
     indices_group = group_indices(tx)
 
@@ -146,7 +144,8 @@ def train_models_ridge_regression(y, tx, degrees, lambdas, k_fold, seed=1):
         # Standardize the training subset
         tx_subset_standardized, _, _ = standardize(tx_subset)
 
-        opt_degree, opt_lambda = best_hyperparameters_accuracy(y_subset, tx_subset_standardized, degrees, lambdas, k_fold, seed)
+        opt_degree, opt_lambda = best_hyperparameters_accuracy(y_subset, tx_subset_standardized, degrees,
+                                                               lambdas, k_fold, seed)
         weights, _ = ridge_regression(y_subset, build_poly(tx_subset_standardized, opt_degree), opt_lambda)
 
         best_degree.append(opt_degree)
